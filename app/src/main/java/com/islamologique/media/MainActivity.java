@@ -5,13 +5,17 @@ import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
@@ -25,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private String listNoms[];
     private int playIndex=0;
     private MediaPlayer mediaPlayer;
+    private ListView listMusic;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,12 +44,13 @@ public class MainActivity extends AppCompatActivity {
         this.textMaxTime=(TextView) this.findViewById(R.id.textView_maxTime);
         this.buttonStart= (Button) this.findViewById(R.id.button_start);
         this.buttonPause= (Button) this.findViewById(R.id.button_pause);
-
+        this.listMusic= (ListView) this.findViewById(R.id.msuicList);
         this.buttonPause.setEnabled(false);
 
         this.seekBar= (SeekBar) this.findViewById(R.id.seekBar);
         this.seekBar.setClickable(false);
-
+        ArrayAdapter<String> aa = new ArrayAdapter<>(this,android.R.layout.simple_list_item_1,Arrays.asList(listNoms));
+        listMusic.setAdapter(aa);
         this.mediaPlayer=new MediaPlayer();
 
         try {
@@ -77,7 +83,29 @@ public class MainActivity extends AppCompatActivity {
             }
 
         });
-       // mediaPlayer.prepare();
+        this.listMusic.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                try {
+                    if (mediaPlayer != null) {
+                        if (mediaPlayer.isPlaying()) {
+                            mediaPlayer.stop();
+                        }
+                        mediaPlayer=new MediaPlayer();
+                        playIndex=position;
+                    }
+                    AssetFileDescriptor descriptor = getAssets().openFd("music/"+listNoms[playIndex]);
+                    mediaPlayer.setDataSource(descriptor.getFileDescriptor(), descriptor.getStartOffset(), descriptor.getLength());
+                    descriptor.close();
+                    mediaPlayer.prepare();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                doStart(null);
+            }
+        });
+
+        // mediaPlayer.prepare();
 
     }
 
