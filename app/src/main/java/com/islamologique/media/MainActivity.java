@@ -55,6 +55,28 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            private int mProgressAtStartTracking;
+            //private final int SENSITIVITY;
+
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                // handle progress change
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                if(mediaPlayer!=null)
+                    if(mediaPlayer.isPlaying())
+                        mediaPlayer.seekTo(seekBar.getProgress());
+            }
+
+        });
        // mediaPlayer.prepare();
 
     }
@@ -99,7 +121,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void doStart(View view)  {
         int duration = this.mediaPlayer.getDuration();
-
         int currentPosition = this.mediaPlayer.getCurrentPosition();
         if(currentPosition== 0)  {
             this.seekBar.setMax(duration);
